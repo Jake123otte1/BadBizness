@@ -1,3 +1,5 @@
+![banner](badbiz.png)
+
 # BadBizness
 Automatic exploitation script for the Java web framework [OF Biz](https://ofbiz.apache.org/) under CVE-2023-51467. Inspired by the HackTheBox machine [Bizness](https://app.hackthebox.com/machines/582).
 
